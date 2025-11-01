@@ -1,0 +1,6 @@
+@PHR.Api_HostAddress = http://localhost:5271
+
+GET {{PHR.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
