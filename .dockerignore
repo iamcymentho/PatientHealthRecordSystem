@@ -1,0 +1,56 @@
+# .NET Core build artifacts
+**/bin/
+**/obj/
+**/out/
+**/.vs/
+**/.vscode/
+
+# Database files
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/*.sqlite
+**/*.sqlite3
+
+# Environment files
+**/.env
+**/.env.*
+**/appsettings.Development.json
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+**/*.md
+!README.md
+
+# Docker files
+**/Dockerfile*
+**/docker-compose*
+**/.dockerignore
+
+# IDE
+**/.idea
+**/.vs
+**/.vscode
+
+# Logs
+**/logs/
+**/*.log
+
+# Test results
+**/TestResults/
+**/*.trx
+
+# NuGet
+**/packages/
+**/*.nupkg
+
+# Misc
+**/node_modules/
+**/*.user
+**/*.suo
+**/.DS_Store
+**/Thumbs.db

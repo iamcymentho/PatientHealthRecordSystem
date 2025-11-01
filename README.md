@@ -25,21 +25,22 @@ A comprehensive Patient Health Records management system built with .NET 9.0, fe
 - **ASP.NET Core Web API** - RESTful API development
 - **Entity Framework Core** - ORM with SQLite database
 - **MediatR** - CQRS pattern implementation
+- **AutoMapper** - Object-to-object mapping
 - **FluentValidation** - Request validation
 - **JWT (JSON Web Tokens)** - Authentication and authorization
 - **Repository Pattern** - Data access abstraction
 - **Decorator Pattern** - Caching implementation
 - **Clean Architecture** - Separation of concerns
+- **Docker** - Containerization and deployment
 
 ### Project Structure
 
 ```
 PHR/
 ├── PHR.Domain/              # Domain entities and enums
-├── PHR.Application/         # Business logic, commands, queries
-├── PHR.Infrastructure/      # Data access, external services
-├── PHR.Persistence/         # Database context and repositories
-└── PHR.Api/                 # Web API controllers and services
+├── PHR.Application/         # Business logic, commands, queries, services
+├── PHR.Infrastructure/      # Data access, repositories, external services
+└── PHR.Api/                 # Web API controllers and middleware
 ```
 
 ---
@@ -119,17 +120,19 @@ PHR/
 ```
 ┌─────────────────────────────────────────┐
 │          PHR.Api (Presentation)         │
-│  Controllers, Middleware, Filters       │
+│   Controllers, Middleware, Filters      │
 └───────────────┬─────────────────────────┘
                 │
 ┌───────────────▼─────────────────────────┐
 │      PHR.Application (Use Cases)        │
-│  Commands, Queries, Handlers, DTOs      │
+│ Commands, Queries, Handlers, Services,  │
+│         DTOs, Mapping Profiles          │
 └───────────────┬─────────────────────────┘
                 │
 ┌───────────────▼─────────────────────────┐
 │    PHR.Infrastructure (External)        │
-│  Repositories, Services, Configurations │
+│  Repositories, Auth Services, Caching,  │
+│     Database, Email, Configurations     │
 └───────────────┬─────────────────────────┘
                 │
 ┌───────────────▼─────────────────────────┐
@@ -165,13 +168,14 @@ PHR/
 - .NET 9.0 SDK or later
 - SQLite (included with .NET)
 - Visual Studio 2022 or VS Code
+- Docker Desktop (optional, for containerized deployment)
 
-### Installation
+### Option 1: Running Locally
 
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd interswitch
+cd PatientHealthRecordSystem
 ```
 
 2. Restore dependencies:
@@ -193,12 +197,50 @@ dotnet run
 
 The API will be available at `http://localhost:5271`
 
+### Option 2: Running with Docker (Recommended)
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd PatientHealthRecordSystem
+```
+
+2. Configure environment variables:
+```bash
+cp .env.example .env
+# Edit .env and update JWT_SECRET_KEY
+```
+
+3. Build and run with Docker Compose:
+```bash
+docker-compose up -d
+```
+
+The API will be available at `http://localhost:5000`
+
+4. View logs:
+```bash
+docker-compose logs -f
+```
+
+5. Stop the application:
+```bash
+docker-compose down
+```
+
+For detailed Docker deployment instructions, see [DOCKER.md](DOCKER.md)
+
 ### Initial Setup
 
 The system automatically seeds:
 - Default permissions
 - Default roles (Admin, Doctor, Nurse, Patient)
 - Default admin user (check seeding configuration)
+
+### Accessing the API
+
+- **Swagger UI**: http://localhost:5000/swagger (Docker) or http://localhost:5271/swagger (local)
+- **Health Check**: http://localhost:5000/api/Health (Docker) or http://localhost:5271/api/Health (local)
 
 ---
 
@@ -963,16 +1005,37 @@ CREATE TABLE AccessRequests (
 
 ---
 
-## TODO:: if time permits me
+## Deployment
 
-- [ ] Dockerization
-- [ ] Email service integration for password reset (Smtp Implementation)
+### Docker Deployment
+
+The application is fully containerized and production-ready. See [DOCKER.md](DOCKER.md) for complete deployment instructions.
+
+**Quick Docker Commands:**
+```bash
+# Build and start
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop
+docker-compose down
+```
+
+
+## TODO:: If time peris 
+- [ ] Dockerrization ✅
+- [ ] Email service integration for password reset (SMTP Implementation)
 - [ ] Two-factor authentication (2FA)
-- [ ] Audit logging for all operations
-- [ ] Advanced search and filtering
-- [ ] File upload for medical documents
-- [ ] Real-time  event- driven notifications (pub-sub/ Kafka)
+- [ ] Enhanced audit logging for all operations
+- [ ] Advanced search and filtering with Elasticsearch
+- [ ] File upload for medical documents (S3/Blob storage)
+- [ ] Real-time event-driven notifications (Kafka/RabbitMQ)
 - [ ] Multi-tenant support
+- [ ] PostgreSQL support for production environments
+- [ ] API rate limiting and throttling
+- [ ] Comprehensive integration tests
 
 ---
 
