@@ -6,6 +6,7 @@ using PHR.Domain.Entities;
 using PHR.Application.Abstractions.Repositories;
 using PHR.Application.Auth.Abstractions;
 using PHR.Application.Abstractions.Data;
+using PHR.Application.Abstractions.Services;
 namespace PHR.Application.Services.Implementation
 {
 	public class AuthService : IAuthService
@@ -18,6 +19,7 @@ namespace PHR.Application.Services.Implementation
 		private readonly IRefreshTokenRepository _refreshTokenRepository;
 		private readonly IUserRoleRepository _userRoleRepository;
 		private readonly IPasswordResetTokenRepository _passwordResetTokenRepository;
+		private readonly IEmailService _emailService;
 		public AuthService(
 			ITokenService tokenService,
 			IPasswordVerifier passwordVerifier,
@@ -26,7 +28,8 @@ namespace PHR.Application.Services.Implementation
 			IPasswordHasherAbstraction passwordHasher,
 			IRefreshTokenRepository refreshTokenRepository,
 			IUserRoleRepository userRoleRepository,
-			IPasswordResetTokenRepository passwordResetTokenRepository)
+			IPasswordResetTokenRepository passwordResetTokenRepository,
+			IEmailService emailService)
 		{
 			_tokenService = tokenService;
 			_passwordVerifier = passwordVerifier;
@@ -36,6 +39,7 @@ namespace PHR.Application.Services.Implementation
 			_refreshTokenRepository = refreshTokenRepository;
 			_userRoleRepository = userRoleRepository;
 			_passwordResetTokenRepository = passwordResetTokenRepository;
+			_emailService = emailService;
 		}
 		public async Task<ApiResponse<object>> RegisterAsync(RegisterUserCommand command)
 		{
@@ -211,6 +215,13 @@ namespace PHR.Application.Services.Implementation
 						await _userRoleRepository.SaveChangesAsync();
 					}
 				}
+
+				// Send account created email with temporary password
+				await _emailService.SendAccountCreatedEmailAsync(
+					user.Email,
+					user.FullName,
+					command.DefaultPassword);
+
 				return ApiResponse<object>.CreatedResponse(new { userId = user.Id }, "User created successfully by admin");
 			}
 			catch (Exception ex)
@@ -262,6 +273,10 @@ namespace PHR.Application.Services.Implementation
 				user.LastPasswordChangeUtc = DateTime.UtcNow;
 				await _userRepository.UpdateAsync(user);
 				await _userRepository.SaveChangesAsync();
+
+				// Send password changed notification email
+				await _emailService.SendPasswordChangedNotificationAsync(user.Email, user.FullName);
+
 				return ApiResponse.SuccessResponse("Password changed successfully");
 			}
 			catch (Exception ex)
@@ -291,12 +306,20 @@ namespace PHR.Application.Services.Implementation
 				};
 				await _passwordResetTokenRepository.AddAsync(passwordResetToken);
 				await _passwordResetTokenRepository.SaveChangesAsync();
-				// Return token in response (in production, this would be sent via email)
+
+				// Send password reset email
+				await _emailService.SendPasswordResetEmailAsync(
+					user.Email,
+					user.FullName,
+					resetToken,
+					expiryDate);
+
+				// Return token in response (for development/testing purposes)
 				var response = new
 				{
 					token = resetToken,
 					expiresAt = expiryDate,
-					message = "Password reset token generated successfully. In production, this would be sent via email."
+					message = "Password reset email has been sent. Please check your email for the reset token."
 				};
 				return ApiResponse<object>.SuccessResponse(response, "Password reset token generated successfully");
 			}

@@ -7,6 +7,9 @@ namespace PHR.Application.Abstractions.Services
 		Task SendAccessRequestDeclinedAsync(string recipientEmail, string recipientName, string patientName, string declinedByName, string reason);
 		Task SendAccessRequestCreatedAsync(string recipientEmail, string recipientName, string requestorName, string patientName, string reason);
 		Task SendWelcomeEmailAsync(string recipientEmail, string recipientName);
+		Task SendPasswordResetEmailAsync(string recipientEmail, string recipientName, string resetToken, DateTime expiryDate);
+		Task SendPasswordChangedNotificationAsync(string recipientEmail, string recipientName);
+		Task SendAccountCreatedEmailAsync(string recipientEmail, string recipientName, string temporaryPassword);
 	}
 	public class EmailTemplate
 	{

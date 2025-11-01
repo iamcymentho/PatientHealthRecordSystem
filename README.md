@@ -28,6 +28,7 @@ A comprehensive Patient Health Records management system built with .NET 9.0, fe
 - **AutoMapper** - Object-to-object mapping
 - **FluentValidation** - Request validation
 - **JWT (JSON Web Tokens)** - Authentication and authorization
+- **MailKit** - SMTP email service integration
 - **Repository Pattern** - Data access abstraction
 - **Decorator Pattern** - Caching implementation
 - **Clean Architecture** - Separation of concerns
@@ -241,6 +242,35 @@ The system automatically seeds:
 
 - **Swagger UI**: http://localhost:5000/swagger (Docker) or http://localhost:5271/swagger (local)
 - **Health Check**: http://localhost:5000/api/Health (Docker) or http://localhost:5271/api/Health (local)
+
+### Email Configuration (Optional)
+
+The system includes email notifications for:
+- Password reset requests
+- Password change confirmations
+- New account creation
+
+**To enable email notifications:**
+
+1. Update `appsettings.json` with your SMTP settings:
+```json
+"SmtpSettings": {
+  "Host": "smtp.gmail.com",
+  "Port": 587,
+  "EnableSsl": true,
+  "Username": "your-email@gmail.com",
+  "Password": "your-app-password",
+  "FromEmail": "noreply@phr-system.com",
+  "FromName": "PHR System"
+}
+```
+
+2. For Gmail, use an **App Password** (not your regular password):
+   - Enable 2FA on your Google account
+   - Generate an App Password at https://myaccount.google.com/apppasswords
+   - Use the generated password in the configuration
+
+**Note:** If SMTP is not configured, emails will be logged to the console instead.
 
 ---
 
@@ -1024,14 +1054,20 @@ docker-compose down
 ```
 
 
-## TODO:: If time peris 
-- [ ] Dockerrization ✅
-- [ ] Email service integration for password reset (SMTP Implementation)
+## Completed Features
+
+- ✅ **Dockerization** - Fully containerized application with Docker Compose
+- ✅ **Email Service Integration** - SMTP-based email notifications for password reset, account creation, and password changes
+- ✅ **Clean Architecture** - Proper separation of concerns across layers
+- ✅ **CQRS Pattern** - Command Query Responsibility Segregation with MediatR
+- ✅ **JWT Authentication** - Secure token-based authentication
+
+## TODO:: If time permits
 - [ ] Two-factor authentication (2FA)
 - [ ] Enhanced audit logging for all operations
 - [ ] Advanced search and filtering with Elasticsearch
 - [ ] File upload for medical documents (S3/Blob storage)
-- [ ] Real-time event-driven notifications (Kafka/RabbitMQ)
+- [ ] Real-time event-driven notifications (Pub-Sub: Kafka/RabbitMQ)
 - [ ] Multi-tenant support
 - [ ] PostgreSQL support for production environments
 - [ ] API rate limiting and throttling
