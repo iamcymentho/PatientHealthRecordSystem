@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using PHR.Application.Abstractions.Repositories;
+using PHR.Application.Abstractions.Services;
 using PHR.Application.Auth.Abstractions;
 using PHR.Domain.Entities;
 namespace PHR.Application.Auth.Commands
@@ -11,10 +12,12 @@ namespace PHR.Application.Auth.Commands
 	{
 		private readonly IUserRepository _users;
 		private readonly IPasswordHasherAbstraction _hasher;
-		public RegisterUserCommandHandler(IUserRepository users, IPasswordHasherAbstraction hasher)
+		private readonly IEmailService _emailService;
+		public RegisterUserCommandHandler(IUserRepository users, IPasswordHasherAbstraction hasher, IEmailService emailService)
 		{
 			_users = users;
 			_hasher = hasher;
+			_emailService = emailService;
 		}
 		public async Task<Guid> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
 		{
@@ -34,6 +37,10 @@ namespace PHR.Application.Auth.Commands
 					PasswordHash = _hasher.Hash(request.Password)
 				};
 				await _users.AddAsync(user);
+
+				// Send welcome email
+				await _emailService.SendWelcomeEmailAsync(user.Email, user.FullName);
+
 				return user.Id;
 			}
 			catch (Exception ex)
